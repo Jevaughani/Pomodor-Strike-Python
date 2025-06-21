@@ -7,6 +7,11 @@ A modern, feature-rich Pomodoro timer application built with Python and CustomTk
 ![Platform](https://img.shields.io/badge/Platform-Windows-lightgrey.svg)
 ![Version](https://img.shields.io/badge/Version-1.0.0-orange.svg)
 
+## MESSAGE FROM CREATOR
+>PLEASE NOTE AS IT STANDS THE UPDATE SYSTEM IS NOT FUNCTIONAL. PLEASE DISABLE AUTO UPDATE IN SETTINGS. THIS MIGHT AFFECT OTHER FEATUES AS WELL I FEAR
+>
+> ~ Jevaughani Lee
+
 ## ✨ Features
 
 ### ⏱️ Timer System
