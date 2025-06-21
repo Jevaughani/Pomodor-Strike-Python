@@ -20,8 +20,8 @@ import hashlib
 class UpdateSystem:
     def __init__(self):
         self.current_version = "1.0.0"
-        self.update_url = "https://api.github.com/repos/yourusername/pomodoro-strike-python/releases/latest"
-        self.download_base_url = "https://github.com/yourusername/pomodoro-strike-python/releases/download"
+        self.update_url = "https://api.github.com/repos/Jevaughani/pomodoro-strike-python/releases/latest"
+        self.download_base_url = "https://github.com/Jevaughani/pomodoro-strike-python/releases/download"
         self.app_name = "PomodoroStrike"
         self.update_check_interval = 24 * 60 * 60  # 24 hours in seconds
         
