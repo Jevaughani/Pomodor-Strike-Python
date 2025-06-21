@@ -19,6 +19,14 @@ jobs:
       with:
         python-version: '3.11'
         
+    - name: List directory contents
+      run: |
+        echo "Root directory contents:"
+        Get-ChildItem -Name
+        echo ""
+        echo "Python directory contents:"
+        Get-ChildItem -Path "Python" -Name
+        
     - name: Install dependencies
       run: |
         cd Python
@@ -36,16 +44,30 @@ jobs:
         echo "Checking if executable was created..."
         if (Test-Path "Python\dist\PomodoroStrike.exe") {
           echo "✅ Executable found: Python\dist\PomodoroStrike.exe"
-          echo "File size: $((Get-Item 'Python\dist\PomodoroStrike.exe').Length) bytes"
+          $fileSize = (Get-Item 'Python\dist\PomodoroStrike.exe').Length
+          echo "File size: $fileSize bytes"
+          if ($fileSize -lt 1000000) {
+            echo "⚠️ Warning: File size seems small, might be incomplete"
+          }
         } else {
           echo "❌ Executable not found!"
+          echo "Checking dist directory contents:"
+          if (Test-Path "Python\dist") {
+            Get-ChildItem -Path "Python\dist" -Recurse
+          } else {
+            echo "dist directory does not exist"
+          }
           exit 1
         }
         
     - name: List build artifacts
       run: |
         echo "Build artifacts:"
-        Get-ChildItem -Path "Python\dist" -Recurse | ForEach-Object { echo $_.FullName }
+        if (Test-Path "Python\dist") {
+          Get-ChildItem -Path "Python\dist" -Recurse | ForEach-Object { echo $_.FullName }
+        } else {
+          echo "dist directory not found"
+        }
         
     - name: Create release
       uses: softprops/action-gh-release@v1
