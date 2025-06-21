@@ -557,6 +557,19 @@ class PomodoroStrike(ctk.CTk):
             text_color="gray"
         ).pack(pady=(5,0))
 
+        # Version display
+        if UPDATE_SYSTEM_AVAILABLE and self.update_system:
+            current_version = self.update_system.get_current_version()
+        else:
+            current_version = "1.0.1"  # Updated version for testing
+            
+        ctk.CTkLabel(
+            self.branding_frame,
+            text=f"Version {current_version}",
+            font=ctk.CTkFont(size=10),
+            text_color="lightblue"
+        ).pack(pady=(2,0))
+
         # Quick stats
         self.stats_frame = ctk.CTkFrame(self.sidebar)
         self.stats_frame.pack(fill="x", padx=20, pady=(0, 20))
