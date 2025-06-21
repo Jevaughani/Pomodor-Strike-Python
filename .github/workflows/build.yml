@@ -31,6 +31,22 @@ jobs:
         cd Python
         python build_exe.py
         
+    - name: Verify build
+      run: |
+        echo "Checking if executable was created..."
+        if (Test-Path "Python\dist\PomodoroStrike.exe") {
+          echo "✅ Executable found: Python\dist\PomodoroStrike.exe"
+          echo "File size: $((Get-Item 'Python\dist\PomodoroStrike.exe').Length) bytes"
+        } else {
+          echo "❌ Executable not found!"
+          exit 1
+        }
+        
+    - name: List build artifacts
+      run: |
+        echo "Build artifacts:"
+        Get-ChildItem -Path "Python\dist" -Recurse | ForEach-Object { echo $_.FullName }
+        
     - name: Create release
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
@@ -38,6 +54,8 @@ jobs:
         files: |
           Python/dist/PomodoroStrike.exe
           Python/install.bat
+          install.ps1
+          build.bat
         body: |
           ## What's New
           
@@ -53,10 +71,17 @@ jobs:
           1. Download `PomodoroStrike.exe`
           2. Run the executable directly
           
-          ### Option 2: Installer
+          ### Option 2: Batch Installer
           1. Download `install.bat`
-          2. Run the installer to install to AppData folder
-          3. Desktop shortcut will be created automatically
+          2. Run the installer for guided installation
+          
+          ### Option 3: PowerShell Installer
+          1. Download `install.ps1`
+          2. Run: `.\install.ps1 -AddToStartup`
+          
+          ### Option 4: Build from Source
+          1. Download `build.bat`
+          2. Run to build your own executable
           
           ## System Requirements
           - Windows 10 or later
