@@ -21,6 +21,14 @@ from collections import defaultdict
 from CTkToolTip import *
 import sys
 
+# Update system imports
+try:
+    from update_system import UpdateSystem, check_for_updates_async
+    UPDATE_SYSTEM_AVAILABLE = True
+except ImportError:
+    UPDATE_SYSTEM_AVAILABLE = False
+    print("Update system not available - running without auto-updates")
+
 def get_data_path(file_name: str) -> str:
     """Get path to data file, works for script and frozen exe."""
     if getattr(sys, 'frozen', False):
@@ -348,6 +356,13 @@ class PomodoroStrike(ctk.CTk):
         # Productivity data
         self.productivity_data = ProductivityData()
         
+        # Update system
+        if UPDATE_SYSTEM_AVAILABLE:
+            self.update_system = UpdateSystem()
+            self.start_update_checker()
+        else:
+            self.update_system = None
+        
         # Settings
         self.settings = {
             "pomodoro_time": 25,
@@ -451,6 +466,9 @@ class PomodoroStrike(ctk.CTk):
                 item('Show App', self.show_app),
                 item('Start Timer', self.start_timer),
                 item('Pause Timer', self.pause_timer),
+                pystray.Menu.SEPARATOR,
+                item('Check for Updates', self.check_for_updates_manual) if UPDATE_SYSTEM_AVAILABLE else None,
+                item('Version Info', self.show_version_info) if UPDATE_SYSTEM_AVAILABLE else None,
                 pystray.Menu.SEPARATOR,
                 item('Quit', self.quit_app)
             )
@@ -975,6 +993,44 @@ class PomodoroStrike(ctk.CTk):
             variable=self.sound_var
         )
         sound_menu.pack(fill="x", pady=(0, 20))
+        
+        # Update Settings
+        if UPDATE_SYSTEM_AVAILABLE:
+            ctk.CTkLabel(
+                content_frame, 
+                text="Update Settings", 
+                font=ctk.CTkFont(size=16, weight="bold")
+            ).pack(anchor="w", pady=(0, 10))
+            
+            # Version info
+            if self.update_system:
+                current_version = self.update_system.get_current_version()
+            else:
+                current_version = "1.0.0"
+                
+            version_label = ctk.CTkLabel(
+                content_frame, 
+                text=f"Current Version: {current_version}", 
+                font=ctk.CTkFont(size=14)
+            )
+            version_label.pack(anchor="w", pady=(0, 10))
+            
+            # Check for updates button
+            ctk.CTkButton(
+                content_frame, 
+                text="Check for Updates", 
+                command=self.check_for_updates_manual,
+                fg_color="green"
+            ).pack(fill="x", pady=(0, 10))
+            
+            # Auto-update toggle
+            self.auto_update_var = ctk.BooleanVar(value=True)
+            auto_update_checkbox = ctk.CTkCheckBox(
+                content_frame, 
+                text="Check for updates automatically", 
+                variable=self.auto_update_var
+            )
+            auto_update_checkbox.pack(anchor="w", pady=(0, 20))
         
         # Buttons
         buttons_frame = ctk.CTkFrame(content_frame)
@@ -2392,6 +2448,54 @@ class PomodoroStrike(ctk.CTk):
     def update_total_time_display(self):
         # This method is now handled by update_sidebar_stats
         self.update_sidebar_stats()
+
+    def start_update_checker(self):
+        """Start background update checker"""
+        if not UPDATE_SYSTEM_AVAILABLE or not self.update_system:
+            return
+            
+        def update_checker():
+            while True:
+                try:
+                    # Check for updates every 24 hours
+                    time.sleep(24 * 60 * 60)  # 24 hours
+                    update_callback = check_for_updates_async()
+                    if update_callback:
+                        # Schedule update dialog in main thread
+                        self.after(0, update_callback)
+                except Exception as e:
+                    print(f"Update checker error: {e}")
+        
+        # Start update checker in background thread
+        update_thread = threading.Thread(target=update_checker, daemon=True)
+        update_thread.start()
+        
+    def check_for_updates_manual(self):
+        """Manual update check from settings"""
+        if not UPDATE_SYSTEM_AVAILABLE or not self.update_system:
+            messagebox.showinfo("Update System", "Update system is not available.")
+            return
+            
+        try:
+            update_info = self.update_system.check_for_updates(silent=False)
+            if update_info:
+                self.update_system.create_update_dialog(update_info)
+            else:
+                messagebox.showinfo("No Updates", "You are running the latest version!")
+        except Exception as e:
+            messagebox.showerror("Update Error", f"Failed to check for updates: {e}")
+    
+    def show_version_info(self):
+        """Show current version information"""
+        if UPDATE_SYSTEM_AVAILABLE and self.update_system:
+            current_version = self.update_system.get_current_version()
+        else:
+            current_version = "1.0.0"
+            
+        messagebox.showinfo(
+            "Version Information", 
+            f"Pomodoro Strike\nVersion: {current_version}\n\nCheck for updates in settings."
+        )
 
 if __name__ == "__main__":
     app = PomodoroStrike()

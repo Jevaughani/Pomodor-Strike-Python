@@ -5,6 +5,7 @@ A modern, feature-rich Pomodoro timer application built with Python and CustomTk
 ![Pomodoro Strike](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Platform](https://img.shields.io/badge/Platform-Windows-lightgrey.svg)
+![Version](https://img.shields.io/badge/Version-1.0.0-orange.svg)
 
 ## ✨ Features
 
@@ -59,6 +60,12 @@ A modern, feature-rich Pomodoro timer application built with Python and CustomTk
 - **Custom Break Intervals**: Flexible break scheduling
 - **Appearance Modes**: Light/dark theme switching
 
+### 🔄 Auto-Updates
+- **Automatic Update Checks**: Daily background update checks
+- **Seamless Updates**: One-click download and installation
+- **Version Management**: Automatic version tracking
+- **Release Notes**: View what's new in each update
+
 ## 🚀 Installation
 
 ### Prerequisites
@@ -83,12 +90,159 @@ A modern, feature-rich Pomodoro timer application built with Python and CustomTk
    python pomodoro_strike.py
    ```
 
+### Building Executable
+
+#### Option 1: Using Build Script (Recommended)
+1. **Run the build script**
+   ```bash
+   # On Windows
+   build.bat
+   
+   # Or manually
+   cd Python
+   python build_exe.py
+   ```
+
+2. **Find the executable**
+   - Location: `Python/dist/PomodoroStrike.exe`
+   - Run directly or use the installer: `Python/install.bat`
+
+#### Option 2: Manual PyInstaller
+1. **Install PyInstaller**
+   ```bash
+   pip install pyinstaller
+   ```
+
+2. **Build the executable**
+   ```bash
+   cd Python
+   pyinstaller --onefile --windowed --name PomodoroStrike pomodoro_strike.py
+   ```
+
+### Download Pre-built Executable
+- **Latest Release**: Download from [GitHub Releases](https://github.com/yourusername/pomodoro-strike-python/releases)
+- **Direct Download**: `PomodoroStrike.exe` - no installation required
+- **Installer**: `install.bat` - installs to AppData with desktop shortcut
+
+### Installation Methods
+
+#### Method 1: Batch Installer (Simple)
+```bash
+# Run the batch installer
+install.bat
+```
+
+#### Method 2: PowerShell Installer (Advanced)
+```powershell
+# Basic installation to C:\PomodoroStrike
+.\install.ps1
+
+# Install with startup (startup folder)
+.\install.ps1 -AddToStartup -StartupFolder
+
+# Install with registry startup
+.\install.ps1 -AddToStartup -Registry
+
+# Install with task scheduler startup
+.\install.ps1 -AddToStartup -TaskScheduler
+
+# Install to custom location
+.\install.ps1 -InstallPath "D:\MyApps\PomodoroStrike" -AddToStartup
+```
+
+#### Method 3: Manual Installation
+Follow the detailed steps below for manual installation.
+
+### Installation to C Drive (Recommended)
+
+#### Step 1: Create Application Folder
+1. **Create a dedicated folder** for the application:
+   ```bash
+   # Create folder in C drive
+   mkdir "C:\PomodoroStrike"
+   
+   # Or create in Program Files (requires admin)
+   mkdir "C:\Program Files\PomodoroStrike"
+   ```
+
+2. **Copy the executable** to the folder:
+   ```bash
+   # Copy from build location
+   copy "Python\dist\PomodoroStrike.exe" "C:\PomodoroStrike\"
+   
+   # Or if using installer
+   copy "Python\install.bat" "C:\PomodoroStrike\"
+   ```
+
+#### Step 2: Create Desktop Shortcut
+```bash
+# Create desktop shortcut
+powershell "$WshShell = New-Object -comObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut('%USERPROFILE%\Desktop\Pomodoro Strike.lnk'); $Shortcut.TargetPath = 'C:\PomodoroStrike\PomodoroStrike.exe'; $Shortcut.Save()"
+```
+
+#### Step 3: Add to Startup (Optional)
+1. **Using Startup Folder** (Recommended):
+   ```bash
+   # Copy shortcut to startup folder
+   copy "%USERPROFILE%\Desktop\Pomodoro Strike.lnk" "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\"
+   ```
+
+2. **Using Registry** (Advanced):
+   ```bash
+   # Add to registry startup (run as administrator)
+   reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /v "PomodoroStrike" /t REG_SZ /d "C:\PomodoroStrike\PomodoroStrike.exe" /f
+   ```
+
+3. **Using Task Scheduler** (Most Reliable):
+   ```bash
+   # Create scheduled task (run as administrator)
+   schtasks /create /tn "PomodoroStrike" /tr "C:\PomodoroStrike\PomodoroStrike.exe" /sc onlogon /ru "%USERNAME%" /f
+   ```
+
+### Alternative Installation Locations
+
+#### Option 1: AppData (Default)
+- **Location**: `%APPDATA%\PomodoroStrike\`
+- **Pros**: User-specific, no admin rights needed
+- **Cons**: Hidden folder, harder to find
+
+#### Option 2: Program Files
+- **Location**: `C:\Program Files\PomodoroStrike\`
+- **Pros**: Standard location, easy to find
+- **Cons**: Requires admin rights for installation
+
+#### Option 3: Custom Location
+- **Location**: Any folder you prefer
+- **Pros**: Full control over location
+- **Cons**: Need to remember where you put it
+
+### Startup Configuration
+
+#### Automatic Startup Options
+1. **Startup Folder**: Easiest method, user-specific
+2. **Registry**: System-wide, requires admin
+3. **Task Scheduler**: Most reliable, can set conditions
+4. **Application Settings**: Built-in option in settings
+
+#### Disable Startup
+```bash
+# Remove from startup folder
+del "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\Pomodoro Strike.lnk"
+
+# Remove from registry
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /v "PomodoroStrike" /f
+
+# Remove scheduled task
+schtasks /delete /tn "PomodoroStrike" /f
+```
+
 ## 📦 Dependencies
 
 - **customtkinter** (5.2.0): Modern UI framework
 - **pillow** (10.0.1): Image processing for icons and graphics
 - **pystray** (0.19.4): System tray functionality
 - **CTkToolTip** (0.8): Enhanced tooltips
+- **requests** (2.31.0): HTTP requests for update system
 
 ## 🎮 Usage
 
@@ -111,6 +265,12 @@ A modern, feature-rich Pomodoro timer application built with Python and CustomTk
 3. **Track Progress**: Monitor focus streaks and achievements
 4. **Export Data**: Download productivity reports
 
+### Update System
+1. **Automatic Checks**: Updates are checked daily in the background
+2. **Manual Check**: Check for updates through settings
+3. **Download Updates**: One-click download and installation
+4. **Version History**: View release notes and changelog
+
 ## ⚙️ Configuration
 
 ### Default Settings
@@ -120,6 +280,7 @@ A modern, feature-rich Pomodoro timer application built with Python and CustomTk
 - **Long Break Frequency**: Every 4 sessions
 - **Water Reminders**: Every 60 minutes
 - **Theme**: Blue (dark mode)
+- **Auto-updates**: Enabled (daily checks)
 
 ### Customization
 Access settings through the gear icon to customize:
@@ -128,6 +289,28 @@ Access settings through the gear icon to customize:
 - Sound settings
 - Appearance options
 - Productivity goals
+- Update preferences
+
+## 🔄 Update System
+
+### How Updates Work
+1. **Background Checks**: Application checks for updates daily
+2. **GitHub Integration**: Uses GitHub Releases API for version checking
+3. **Automatic Download**: Downloads updates in the background
+4. **Seamless Installation**: Installs updates and restarts automatically
+5. **Backup System**: Creates backups before updating
+
+### Update Process
+1. **Version Check**: Compares current version with latest release
+2. **Download**: Downloads new executable from GitHub Releases
+3. **Backup**: Creates backup of current executable
+4. **Install**: Replaces current executable with new version
+5. **Restart**: Automatically restarts the application
+
+### Manual Update Check
+- Access settings and click "Check for Updates"
+- View current version and latest available version
+- Download and install updates manually if needed
 
 ## 🎯 Productivity Tips
 
@@ -156,6 +339,23 @@ Contributions are welcome! Please feel free to submit issues and pull requests t
 3. Make your changes
 4. Test thoroughly
 5. Submit a pull request
+
+### Building for Development
+1. **Install development dependencies**
+   ```bash
+   pip install -r requirements.txt
+   pip install pyinstaller
+   ```
+
+2. **Run the application**
+   ```bash
+   python pomodoro_strike.py
+   ```
+
+3. **Build executable**
+   ```bash
+   python build_exe.py
+   ```
 
 ## 📄 License
 
